@@ -1,6 +1,7 @@
 package co.simplon.restaurant;
 
 import co.simplon.restaurant.model.Bill;
+import co.simplon.restaurant.side.Read;
 
 import java.util.Scanner;
 
@@ -16,9 +17,8 @@ public class Menu {
         System.out.println("2 : Afficher le classement des plats par chiffre d'affaire");
         System.out.println("3 : Afficher le classement des tables par chiffre d'affaire");
         System.out.println("");
-        System.out.print("Quel est ton choix ? : ");
+        int choice = Read.readInt(sc, "Quel est ton choix ? : ");
         System.out.println("");
-        int choice = sc.nextInt();
 
         switch (choice) {
             case 0: {

@@ -1,5 +1,8 @@
 package co.simplon.restaurant.model;
 
+import co.simplon.restaurant.Menu;
+import co.simplon.restaurant.side.Read;
+
 import java.sql.*;
 import java.util.Scanner;
 
@@ -45,9 +48,11 @@ public class Bill {
             System.out.println("");
             Table.getTable(connection);
             System.out.println("");
-            System.out.print("Quel est le numéro de la table choisie ? : ");
-            int table = sc.nextInt();
-            sc.nextLine();
+            int table = Read.readInt(sc, "Quel est le numéro de la table choisie ? : ");
+
+            // A faire : faire en sorte que les choix soient valides (compris entre 1 et 8 pour les tables par exemple)
+            // int table = Read.validTable(sc);
+
             System.out.println("");
 
             // Afficher les serveurs dispos
@@ -56,57 +61,59 @@ public class Bill {
             System.out.println("");
             Server.getServer(connection);
             System.out.println("");
-            System.out.print("Quel est le numéro du (de la) serveur(se) ? : ");
-            int server = sc.nextInt();
-            sc.nextLine();
+            int server = Read.readInt(sc, "Quel est le numéro du (de la) serveur(se) ? : ");
             System.out.println("");
 
             // Création d'un objet de classe Bill et enregistrement dans la BDD
             Bill newBill = new Bill(table, server);
             newBill.saveBill(connection);
 
-            // Vérification du n0° de l'ID
-            int currentBill = newBill.getIdBill();
-            System.out.println(currentBill);
-
+            // Vérification du n° de l'ID
+            System.out.println("Le n° de l'ID est : " + newBill.idBill);
 
 //            // Boucler sur la demande de plats (à faire)
 
-            // Afficher les plats
-            System.out.println("");
-            System.out.println("Voici les plats disponibles :");
-            System.out.println("");
-            Dish.getDish(connection);
-            System.out.println("");
-            System.out.print("Quel numéro de plat souhaites-tu sélectionner ? : ");
-            int dish = sc.nextInt();
-            sc.nextLine();
-            System.out.println("");
-            System.out.print("Quelle est la quantité de ce plat ? : ");
-            int quantity = sc.nextInt();
-            sc.nextLine();
-            System.out.println("");
+            int nextDish = -1;
 
-            // Création d'un objet de classe DishBill et enregistrement dans la BDD
-            DishBill newDishBill = new DishBill(dish, quantity);
-            newDishBill.saveDishBill(connection);
+            while (nextDish != 0) {
+
+                // Afficher les plats
+                System.out.println("");
+                System.out.println("Voici les plats disponibles :");
+                System.out.println("");
+                Dish.getDish(connection);
+                System.out.println("");
+                int dish = Read.readInt(sc, "Quel numéro de plat souhaites-tu sélectionner ? : ");
+                System.out.println("");
+                int quantity = Read.readInt(sc, "Quelle est la quantité de ce plat ? : ");
+                System.out.println("");
+
+                // Création d'un objet de classe DishBill et enregistrement dans la BDD
+                DishBill newDishBill = new DishBill(dish, newBill.idBill, quantity);
+                newDishBill.saveDishBill(connection);
+
+                nextDish = Read.readInt(sc, "Voulez-vous ajouter un autre plat ? (Taper 0 pour quitter / 1 pour continuer) : ");
+
+            }
 
             connection.close();
+
+            Menu.menu();
 
         } catch (SQLException exception) {
             // Ma gestion du problème
             System.out.println("Erreur de connexion à la base de données");
             exception.printStackTrace();
         }
-
     }
 
     public void saveBill(Connection connection) throws SQLException {
-        Statement ordreSQL = connection.createStatement();
-        ordreSQL.execute("INSERT INTO bill (table_idx, server_idx) VALUES ('" + tableIDX + "','" + serverIDX + "')");
-        ResultSet rs = ordreSQL.getGeneratedKeys();
-        idBill = rs.next() ? rs.getInt(1) : 0;
-        System.out.println("Mon numéro d'ID : "+idBill);
-        ordreSQL.close();
+        Statement orderSQL = connection.createStatement();
+        orderSQL.execute("INSERT INTO bill (table_idx, server_idx) VALUES ('" + tableIDX + "','" + serverIDX + "')", Statement.RETURN_GENERATED_KEYS);
+        ResultSet rs = orderSQL.getGeneratedKeys();
+        if (rs.next()) {
+            idBill = rs.getInt(1);
+        }
+        orderSQL.close();
     }
 }

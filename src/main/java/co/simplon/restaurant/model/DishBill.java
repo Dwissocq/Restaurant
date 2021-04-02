@@ -6,18 +6,13 @@ import java.sql.Statement;
 
 public class DishBill {
 
-    private int dishIDX;
-    private int billIDX;
-    private int quantity;
+    private final int dishIDX;
+    private final int billIDX;
+    private final int quantity;
 
     public DishBill(int dishIDX, int billIDX, int quantity) {
         this.dishIDX = dishIDX;
         this.billIDX = billIDX;
-        this.quantity = quantity;
-    }
-
-    public DishBill(int dishIDX, int quantity) {
-        this.dishIDX = dishIDX;
         this.quantity = quantity;
     }
 

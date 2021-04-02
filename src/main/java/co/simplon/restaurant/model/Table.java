@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Table {
     private final int idTable;
-    private int numberOfGuest;
+    private final int numberOfGuest;
 
     public Table(int idTable, int numberOfGuest){
         this.idTable = idTable;
